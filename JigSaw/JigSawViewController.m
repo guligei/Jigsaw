@@ -22,7 +22,6 @@
 @property(nonatomic,strong) NodeInfo *parentNodeInfo;
 @property(nonatomic,strong) NSMutableArray *nodeData;
 
-
 @end
 
 @implementation NodeInfo
@@ -46,17 +45,13 @@
 @property(nonatomic) int row;
 @property(nonatomic) int column;
 @property(nonatomic) int second;
-
 @property(nonatomic,strong) NSTimer *myTimer;
-
 @property(nonatomic,strong) NSMutableArray *nodeListArray;
 @property(nonatomic,strong) NSMutableArray *allStatusArray;
 @property(nonatomic,strong) NSMutableArray *rootNodeDataArray;
-
 @property(nonatomic,strong) NSMutableArray *strHashArray;
 @property(nonatomic) long long int destOrder;
 @property(nonatomic) long long int currentOrder;
-
 
 @end
 
@@ -73,34 +68,41 @@
     self.rowSlider.value = 3;
     self.rowSlider.maximumValue = 6;
     self.rowSlider.minimumValue = 2;
-    [self.rowSlider addTarget:self action:@selector(updateValue:) forControlEvents:UIControlEventValueChanged];
     self.columnSlider.value = 3;
     self.columnSlider.maximumValue = 6;
     self.columnSlider.minimumValue = 2;
-    [self.columnSlider addTarget:self action:@selector(updateValue:) forControlEvents:UIControlEventValueChanged];
     
+    [self.rowSlider addTarget:self action:@selector(updateValue:) forControlEvents:UIControlEventValueChanged];
+    [self.columnSlider addTarget:self action:@selector(updateValue:) forControlEvents:UIControlEventValueChanged];
     
     CGFloat sliderWidth = (screenW-self.finishBtn.frame.size.width-60)/2;
     self.rowSlider.frame = CGRectMake(self.finishBtn.frame.size.width+15, self.rowSlider.frame.origin.y, sliderWidth, self.rowSlider.frame.size.height);
     self.columnSlider.frame = CGRectMake(self.finishBtn.frame.size.width+20+sliderWidth, self.rowSlider.frame.origin.y, sliderWidth, self.rowSlider.frame.size.height);
-    
-    
     self.originImageView.frame = CGRectMake(0, 64, screenW, screenH-self.showBtn.frame.size.height - 10-64);
     self.originImageView.hidden = YES;
     
+   
+    [self clearFrontViews];
+    [self loadImageView:nil];
     
     
+}
+
+
+
+/**
+ *  清除添加在view上的拼接模块
+ *
+ */
+-(void)clearFrontViews
+{
     for (int i = 0; i < _row; i++) {
         for (int j = 0 ; j<_column; j++) {
             NSInteger tag = i+j*_row+1;
             [[self.view viewWithTag:tag]removeFromSuperview];
         }
     }
-    [self loadImageView:nil];
-    
-    
 }
-
 
 
 
@@ -111,44 +113,36 @@
 
 
 
-
+/**
+ *  将图片进行切分
+ *
+ */
 -(void)loadImageView:(UIImage *)image
 {
-    
-  
     
     if (!image) {
         NSString *filePath = [[NSBundle mainBundle]pathForResource:@"psb" ofType:@"jpg"];;
         image = [[UIImage alloc]initWithContentsOfFile:filePath];
     }
+    
     int width =screenW/_row;
     int height = (screenH-self.showBtn.frame.size.height - 10-64)/_column;
     NSMutableArray *randomArr = [self randomByRow:_row byColumn:_column];
     int randomIndex = 0;
     WUIImage *imageUtil = [WUIImage shareImageUtil];
-    //    NSDictionary*dict=[imageUtil SeparateImage:image ByX:_row andY:_column cacheQuality:.8 height:screenH-self.showBtn.frame.size.height - 10-64];
+    
+//    NSDictionary*dict=[imageUtil SeparateImage:image ByX:_row andY:_column cacheQuality:.8 height:screenH-self.showBtn.frame.size.height - 10-64];
+
     NSDictionary *dict = [imageUtil SeparateByX:_row andY:_column];
-    
-    
-    
-//    NSString *special = [NSString stringWithFormat:@"%d%d",(_row-1),0];
-//    [randomArr removeObject:special];
-//    [randomArr insertObject:special atIndex:(randomArr.count - (_row - 1))];
-    
-    
     NSString *fileName = [NSString stringWithFormat:@"%@.jpg",[randomArr objectAtIndex:randomIndex]];
     UIImageView *mImageView = [dict valueForKey:fileName];
     width = mImageView.frame.size.width;
     height = mImageView.frame.size.height;
-    
     CGFloat imageOriginX = (screenW - width*_column)/2;
-    
-    
     _destOrder = [self createDestOrder];
     [self.rootNodeDataArray removeAllObjects];
     for (int i = 0; i < _row; i++) {
         for (int j = 0 ; j<_column; j++) {
-
             NSString *fileName = [NSString stringWithFormat:@"%@.jpg",[randomArr objectAtIndex:randomIndex]];
             UIImageView *mImageView = [dict valueForKey:fileName];
             CGRect mRect = CGRectMake(imageOriginX+j*(width+1), i*(height+1) + 44+20, width, height);
@@ -156,17 +150,8 @@
             UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(move:)];
             [mImageView addGestureRecognizer:tap];
             mImageView.userInteractionEnabled = YES;
-            
-            
-            
-            /**
-             *  产生的随机数刚好等于 最后那个元素的时候
-             */
             NSString *name = [NSString stringWithFormat:@"%d",_row*_column];
-
-//            if ([fileName isEqualToString:[NSString stringWithFormat:@"%d%d.jpg",_row-1,_column-1]]) {
-                if ([fileName isEqualToString:[NSString stringWithFormat:@"%@.jpg",name]]) {
-
+            if ([fileName isEqualToString:[NSString stringWithFormat:@"%@.jpg",name]]) {
                 self.lastImageView = mImageView;
                 self.lastImageView.hidden = YES;
                 [self.finishBtn setImage:[UIImage imageNamed:@"icon_continue"] forState:UIControlStateNormal];
@@ -175,14 +160,11 @@
                 [self.view addSubview:mImageView];
             }else{
                 [self.view addSubview:mImageView];
-                
             }
             randomIndex ++;
             NSString *tagName = [NSString stringWithFormat:@"%zd",mImageView.tag];
             [self.rootNodeDataArray addObject:tagName];
         }
-        
-        
     }
     
     NSMutableString *mutiStr = [NSMutableString string];
@@ -232,8 +214,6 @@
         [mutiStr appendString:str];
     }
     NSLog(@"validate  order %@\n",mutiStr);
-    
-    
 }
 
 /**
@@ -248,20 +228,17 @@
         /**
          *  返回第一个位置的值，并且把这个元素删除
          */
-        
-//        NSLog(@"node count %zd",self.nodeListArray.count);
-//        NSLog(@"allstatus count %zd",self.allStatusArray.count);
-       
         if (self.nodeListArray.count > 0) {
              NodeInfo *currentNode  = [self.nodeListArray objectAtIndex:0];
             [self.nodeListArray removeObjectAtIndex:0];
-            
-            
             if (_currentOrder == _destOrder) {
 //            if ([self checkValidate:currentNode.nodeData]) {
                 NSLog(@"success！");
                 break;
             }else{
+                /**
+                 *  1：上,2：下,3：左,4：右,代表四个方向
+                 */
                 for (int i = 1; i<5; i++)
                 {
                     NSMutableArray *step = [self move:currentNode.nodeData direction:i];
@@ -275,13 +252,11 @@
                     }
                 }
             }
-
         }else{
             NSLog(@"无解....");
             break;
         }
     }
-    
 }
 
 
@@ -292,7 +267,6 @@
  */
 //-(BOOL)checkHaveStatus:(NSMutableArray *)nodeData
 -(BOOL)checkHaveStatus
-
 {
    
 //    for (NSArray *array in self.allStatusArray) {
@@ -337,7 +311,6 @@
             }else{
                 currentNodeData[pIndex] = currentNodeData[pIndex - 3];
                 currentNodeData[pIndex - 3] = @"9";
-                
             }
             break;
         }
@@ -363,7 +336,6 @@
             {
                 currentNodeData[pIndex] = currentNodeData[pIndex - 1];
                 currentNodeData[pIndex - 1] = @"9";
-                
             }
             break;
         }
@@ -616,14 +588,7 @@
     }
     beforeIndex = mValue;
     
-    
-    for (int i = 0; i < _row; i++) {
-        for (int j = 0 ; j<_column; j++) {
-            NSInteger tag = i+j*_row+1;
-            [[self.view viewWithTag:tag]removeFromSuperview];
-        }
-    }
-    
+    [self clearFrontViews];
     
     if (slider.tag == 2000) {
         self.row = mValue;
@@ -690,17 +655,9 @@
         picker.view.frame = CGRectMake(0, 20,SharedAppDelegate.window.frame.size.width, SharedAppDelegate.window.frame.size.height - 20);
         [UIApplication sharedApplication].statusBarHidden = NO;
     }
-    for (int i = 0; i < _row; i++) {
-        for (int j = 0 ; j<_column; j++) {
-            NSInteger tag = i+j*_row+1;
-            [[self.view viewWithTag:tag]removeFromSuperview];
-        }
-    }
-    
+    [self clearFrontViews];
     [self loadImageView:image];
     [self.myTimer fire];
-    
-    
 }
 
 

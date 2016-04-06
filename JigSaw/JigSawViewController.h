@@ -27,8 +27,6 @@
  2.创建一个集合，记录所有的状态，当新出现的状态是之前未曾有过的，则将该状态，即该叶子节点都放入一个队列。
  3.从该队列中取出一个状态，再进行4个方向上的尝试，即回到第一步。
  4.一直重试，直到队列为空，则说明无解。
- 
-
  */
 
 
@@ -37,11 +35,8 @@
 @property(nonatomic,strong) IBOutlet UIImageView *originImageView;
 @property(nonatomic,strong) IBOutlet UIButton *showBtn;
 @property(nonatomic,strong) IBOutlet UIButton *finishBtn;
-
 @property(nonatomic,strong) IBOutlet UISlider *rowSlider;
 @property(nonatomic,strong) IBOutlet UISlider *columnSlider;
-
-
 @property(nonatomic,strong) IBOutlet UIButton *helpBtn;
 @property(nonatomic,strong) IBOutlet UILabel *timeLabel;
 
