@@ -346,6 +346,7 @@
      *  9代表着空白的位置
      */
     NSInteger pIndex = [currentNodeData indexOfObject:@"9"];
+    
     switch (direction) {
         case KUP:
         {
