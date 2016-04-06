@@ -82,6 +82,10 @@
     self.originImageView.hidden = YES;
     
     
+    
+    
+    
+    
     [self clearFrontViews];
     [self loadImageView:nil];
     
@@ -133,6 +137,8 @@
     /**
      *  照片拼图
      */
+    
+    
     //    NSDictionary*dict=[imageUtil SeparateImage:image ByX:_row andY:_column cacheQuality:.8 height:screenH-self.showBtn.frame.size.height - 10-64];
     /**
      *  数字拼图
@@ -227,662 +233,603 @@
 -(IBAction)autoMove
 {
     
+    
     //    [self nextStep];
     //    return;
     
     NodeInfo *rootNode = [[NodeInfo alloc]initNodeInfoWithParentNode:NULL nodeData:self.rootNodeDataArray];
     [self.nodeListArray addObject:rootNode];
-    
     while (true)
     {
         /**
          *  返回第一个位置的值，并且把这个元素删除
          */
+        
         if (self.nodeListArray.count > 0)
         {
             /**
              *  取出来一个值，删除一个值
              */
             NodeInfo *currentNode  = [self.nodeListArray objectAtIndex:0];
-            [self.nodeListArray removeObjectAtIndex:0];
-            /**
-             *  判断是否是目标序列，1：根据hash值；2，根据数组本身
-             */
-            //        if (_currentOrder == _destOrder) {
-            if ([self checkValidate:currentNode.nodeData])
-            {
-                NSMutableString *mutiStr = [NSMutableString string];
-                for (NSString *str in currentNode.nodeData)
-                {
-                    [mutiStr appendString:str];
-                }
-                NSLog(@"找到合法序列：%@",mutiStr);
-            }
-            else
-            {
-               
-                
-                /**
-                 *  1：上,2：下,3：左,4：右,代表四个方向
-                 */
-                for (int i = 1; i<5; i++)
-                {
-                    NSMutableArray *movedNodeData = [self move:currentNode.nodeData direction:i];
-                    /**
-                     *  移动的序列不为空，并且不等于目标序列
-                     */
-                    //                if (movedNodeData != NULL && _currentOrder != _destOrder)
-                    if (movedNodeData != NULL && ![self checkValidate:currentNode.nodeData])
-                    {
-                        /**
-                         *  判断是否已经包含该状态
-                         */
-                        if (![self checkHaveStatus:currentNode.nodeData])
-                        {
-                            NodeInfo *nodeInfo = [[NodeInfo alloc]initNodeInfoWithParentNode:currentNode nodeData:movedNodeData];
-                            [self.nodeListArray addObject:nodeInfo];
-                        }
-                        
-                    }
-                    else if([self checkValidate:currentNode.nodeData])
-                    {
-                        NSMutableString *mutiStr = [NSMutableString string];
-                        for (NSString *str in movedNodeData)
-                        {
-                            [mutiStr appendString:str];
-                        }
-                        NSLog(@"找到合法序列：%@",mutiStr);
-                        break;
-                    }else
-                    {
-                        NSLog(@"无法移动");
-                    }
-               
-                }
             
-            }
-        }
-        else
-        {
-            NSLog(@"序列无解!！");
-            break;
-        }
-        
-    }
-}
-
-
-
--(void)nextStep
-{
-    
-    if (self.nodeListArray.count == 0) {
-        NodeInfo *rootNode = [[NodeInfo alloc]initNodeInfoWithParentNode:NULL nodeData:self.rootNodeDataArray];
-        [self.nodeListArray addObject:rootNode];
-    }
-    
-    /**
-     *  返回第一个位置的值，并且把这个元素删除
-     */
-    if (self.nodeListArray.count > 0) {
-        /**
-         *  取出来一个值，删除一个值
-         */
-        NodeInfo *currentNode  = [self.nodeListArray objectAtIndex:0];
-        [self.nodeListArray removeObjectAtIndex:0];
-        /**
-         *  判断是否是目标序列，1：根据hash值；2，根据数组本身
-         */
-        //        if (_currentOrder == _destOrder) {
-        if ([self checkValidate:currentNode.nodeData]) {
-            NSMutableString *mutiStr = [NSMutableString string];
-            for (NSString *str in currentNode.nodeData) {
-                [mutiStr appendString:str];
-            }
-            NSLog(@"找到合法序列：%@",mutiStr);
-        }else{
-            /**
-             *  1：上,2：下,3：左,4：右,代表四个方向
-             */
-            for (int i = 1; i<5; i++)
+            if (self.nodeListArray.count > 0)
             {
-                NSMutableArray *movedNodeData = [self move:currentNode.nodeData direction:i];
                 /**
-                 *  移动的序列不为空，并且不等于目标序列
+                 *  取出来一个值，删除一个值
                  */
-                //                if (movedNodeData != NULL && _currentOrder != _destOrder)
-                if (movedNodeData != NULL && ![self checkValidate:currentNode.nodeData])
-                {
-                    /**
-                     *  判断是否已经包含该状态
-                     */
-                    if (![self checkHaveStatus])
-                    {
-                        NodeInfo *nodeInfo = [[NodeInfo alloc]initNodeInfoWithParentNode:currentNode nodeData:movedNodeData];
-                        [self.nodeListArray addObject:nodeInfo];
-                    }
-                    
-                }else if([self checkValidate:currentNode.nodeData])
+                NodeInfo *currentNode  = [self.nodeListArray objectAtIndex:0];
+                [self.nodeListArray removeObjectAtIndex:0];
+                /**
+                 *  判断是否是目标序列，1：根据hash值；2，根据数组本身
+                 */
+                
+                //        if (_currentOrder == _destOrder) {
+                if ([self checkValidate:currentNode.nodeData])
                 {
                     NSMutableString *mutiStr = [NSMutableString string];
-                    for (NSString *str in movedNodeData) {
+                    for (NSString *str in currentNode.nodeData)
+                    {
                         [mutiStr appendString:str];
                     }
                     NSLog(@"找到合法序列：%@",mutiStr);
+                }
+                else
+                {
+                    /**
+                     *  1：上,2：下,3：左,4：右,代表四个方向
+                     */
+                    for (int i = 1; i<5; i++)
+                    {
+                        NSMutableArray *movedNodeData = [self move:currentNode.nodeData direction:i];
+                        /**
+                         *  移动的序列不为空，并且不等于目标序列
+                         */
+                        //                if (movedNodeData != NULL && _currentOrder != _destOrder)
+                        if (movedNodeData != NULL && ![self checkValidate:currentNode.nodeData])
+                        {
+                            /**
+                             *  判断是否已经包含该状态
+                             */
+                            
+                            if (![self checkHaveStatus:currentNode.nodeData])
+                            {
+                                NodeInfo *nodeInfo = [[NodeInfo alloc]initNodeInfoWithParentNode:currentNode nodeData:movedNodeData];
+                                [self.nodeListArray addObject:nodeInfo];
+                            }
+                            
+                            
+                        }
+                        else if([self checkValidate:currentNode.nodeData])
+                        {
+                            NSMutableString *mutiStr = [NSMutableString string];
+                            for (NSString *str in movedNodeData) {
+                                [mutiStr appendString:str];
+                            }
+                            NSLog(@"找到合法序列：%@",mutiStr);
+                            break;
+                            
+                        }else
+                        {
+                            NSLog(@"无法移动");
+                        }
+                        
+                    }
+                    
+                }
+            }
+            else{
+                    NSLog(@"序列无解！");
                     break;
-                }else{
-                    NSLog(@"无法移动");
                 }
             }
         }
-    }else{
-        NSLog(@"序列无解！");
     }
     
-}
-
-
-/**
- *  是否包含对应状态
- *
- */
--(BOOL)checkHaveStatus
-{
-    for (NSString *i in self.strHashArray) {
-        long long j = [i longLongValue];
-        if (j==_currentOrder) {
-            return true;
-        }
-    }
-    [self.strHashArray addObject:[NSString stringWithFormat:@"%lld",_currentOrder]];
-    return false;
     
-}
-
-
-
-/**
- *  是否包含对应状态
- *
- */
--(BOOL)checkHaveStatus:(NSMutableArray *)nodeData
-{
-    for (NSArray *array in self.allStatusArray) {
-        if ([array isEqualToArray:nodeData]) {
-            return true;
-        }
-    }
-    [self.allStatusArray addObject:nodeData];
-    return false;
-}
-
-
-
-
-/**
- * 移动的空白模块
- *
- */
-
--(NSMutableArray *)move:(NSMutableArray *)cNodeData direction:(NSInteger)direction
-{
-    static NSInteger moveCount = 0;
-    NSMutableArray *currentNodeData = [NSMutableArray arrayWithArray:cNodeData];
     /**
-     *  9代表着空白的位置
+     *  是否包含对应状态
+     *
      */
-    NSInteger pIndex = [currentNodeData indexOfObject:@"9"];
-    static NSString *moveDirection = @"";
-    switch (direction) {
-        case KUP:
-        {
-            if (pIndex < 3) {
-                return NULL;
-            }else{
-                currentNodeData[pIndex] = currentNodeData[pIndex - 3];
-                currentNodeData[pIndex - 3] = @"9";
-                moveDirection = @"上";
+    -(BOOL)checkHaveStatus
+    {
+        for (NSString *i in self.strHashArray) {
+            long long j = [i longLongValue];
+            if (j==_currentOrder) {
+                return true;
             }
-            break;
         }
-        case KDOWN:
-        {
-            if (pIndex > 5)
-            {
-                return NULL;
-            }else
-            {
-                currentNodeData[pIndex] = currentNodeData[pIndex + 3];
-                currentNodeData[pIndex + 3] = @"9";
-                moveDirection = @"下";
-                
-            }
-            break;
-        }
-        case KLEFT:
-        {
-            if (pIndex == 0 || pIndex == 3 || pIndex == 6)
-            {
-                return NULL;
-            }
-            else
-            {
-                currentNodeData[pIndex] = currentNodeData[pIndex - 1];
-                currentNodeData[pIndex - 1] = @"9";
-                moveDirection = @"左";
-                
-            }
-            break;
-        }
-        default:
-        {
-            if (pIndex == 2 || pIndex == 5 || pIndex == 8)
-            {
-                return NULL;
-            }
-            else
-            {
-                currentNodeData[pIndex] = currentNodeData[pIndex + 1];
-                currentNodeData[pIndex + 1] = @"9";
-                moveDirection = @"右";
-                
-                
-            }
-            break;
-        }
-    }
-    
-    
-    NSString *mValue = currentNodeData[pIndex];
-    /**
-     *  移动具体模块
-     */
-    //    [self movePlaceFrom:[mValue integerValue]];
-    
-    
-    //    [UIView animateWithDuration:0.5 animations:^{
-    //    }];
-    //
-    //
-    
-    NSMutableString *mutiStr = [NSMutableString string];
-    for (NSString *str in currentNodeData) {
-        [mutiStr appendString:str];
-    }
-    moveCount ++;
-    NSLog(@"移动方向:%@  移动%d次后的队列：%@",moveDirection,moveCount,mutiStr);
-    long long i = [mutiStr hash];
-    _currentOrder = i;
-    //    NSLog(@"当前hash值%lld",_currentOrder);
-    return currentNodeData;
-}
-
-
-
-
-/**
- * 移动拼接模块
- */
--(void)movePlaceFrom:(NSInteger)from
-{
-    
-    UIButton *selectBtn = [self.view viewWithTag:from];
-    //    for (int i = 0; i < _row; i++) {
-    //        for (int j = 0 ; j<_column; j++) {
-    //            NSInteger tag = i+j*_row+1;
-    //            UIButton *btn = [self.view viewWithTag:tag];
-    //            if ([btn.titleLabel.text integerValue]==from) {
-    //                selectBtn = btn;
-    //                break;
-    //            }
-    //        }
-    //    }
-    
-    if (selectBtn) {
-        CGRect frame = selectBtn.frame;
-        selectBtn.frame = self.destinationFrame;
-        self.destinationFrame= frame;
-        //
-        //        [UIView animateWithDuration:0.3 animations:^{
-        //            CGRect frame = selectBtn.frame;
-        //            selectBtn.frame = self.destinationFrame;
-        //            self.destinationFrame= frame;
-        //        }];
-    }
-}
-
-
-
-/**
- *  目标序列hash值的比较
- *
- */
--(long long)createDestOrder
-{
-    NSMutableString *mutiStr = [NSMutableString string];
-    for (int i = 1; i<_row*_column+1; i++) {
-        [mutiStr appendString:[NSString stringWithFormat:@"%zd",i]];
-    }
-    long long mValue = [mutiStr hash];
-    NSLog(@"目标序列的hash值 %lld",mValue);
-    return mValue;
-}
-
-
-
-/**
- *  目标序列本身的比较
- *
- */
--(BOOL)checkValidate:(NSMutableArray *)nodeDataArray
-{
-    for (int i = 1; i<_row*_column+1; i++) {
-        //        NSLog(@"%zd",i);
-        NSInteger tagValue = [[nodeDataArray objectAtIndex:i-1]integerValue];
-        if (tagValue != i) {
-            return false;
-        }
-    }
-    return YES;
-}
-
-
-
-/**
- *  产生随机数
- *
- *  @param row
- *  @param column
- *
- *  @return
- */
--(NSMutableArray *)randomByRow:(int)row byColumn:(int)column
-{
-    NSMutableArray *arr = [NSMutableArray array];
-    NSString *object;
-    int x = 0;
-    int y = 0;
-    int z = 0;
-    while (arr.count < row*column) {
-        x = arc4random() % row;
-        y = arc4random() % column;
-        z = arc4random() % (row*column);
-        z+=1;
-        object = [NSString stringWithFormat:@"%d",z];
-        if (![arr containsObject:object]) {
-            [arr addObject:object];
-        }
-    }
-    return arr;
-}
-
-
-
-/**
- *  四周相邻的判断，移动模块的逻辑方法
- *
- */
--(IBAction)move:(UITapGestureRecognizer *)tap
-{
-    if (self.finishBtn.tag == 5000) {
-        [self.view makeToast:@"oops,请戳左下角图标！"];
-        return;
-    }
-    CGFloat dOriginY = tap.view.frame.origin.y - self.destinationFrame.origin.y;
-    CGFloat dOrginX = tap.view.frame.origin.x - self.destinationFrame.origin.x;
-    
-    NSInteger originYValue = fabs(dOriginY);
-    NSInteger originXValue = fabs(dOrginX);
-    
-    BOOL con1 = originYValue == self.destinationFrame.size.height+1 ? YES:NO;
-    BOOL con2 = originXValue == self.destinationFrame.size.width+1 ? YES:NO;
-    
-    if ((con1&&self.destinationFrame.origin.x==tap.view.frame.origin.x) || (con2&&self.destinationFrame.origin.y==tap.view.frame.origin.y)) {
-        self.bottleFrame = tap.view.frame;
-        tap.view.frame = self.destinationFrame;
-        self.destinationFrame = self.bottleFrame;
-    }
-}
-
-
-
--(void)writeToLocal:(UIImage *)image
-{
-    [self.originImageView setImage:image];
-}
-
-
-/**
- *  点击完成出发操作
- *
- *  @param btn
- */
-
--(IBAction)finishAction:(UIButton *)btn
-{
-    
-    if (self.originImageView.hidden == NO) {
-        self.originImageView.hidden = YES;
-        self.transparentBtn.hidden = YES;
-    }
-    
-    
-    self.lastImageView.frame = self.destinationFrame;
-    if (btn.tag == 5000) {
-        self.lastImageView.hidden = YES;
-        [btn setImage:[UIImage imageNamed:@"icon_continue"] forState:UIControlStateNormal];
-        btn.tag = 4000;
-        [_myTimer setFireDate:[NSDate distantPast]];
-    }else{
-        self.lastImageView.hidden = NO;
-        [btn setImage:[UIImage imageNamed:@"icon_end"] forState:UIControlStateNormal];
-        btn.tag = 5000;
-        [_myTimer setFireDate:[NSDate distantFuture]];
+        [self.strHashArray addObject:[NSString stringWithFormat:@"%lld",_currentOrder]];
+        return false;
         
     }
     
-}
-
-
-
-
-/**
- *  显示隐藏原图
- */
-
--(IBAction)showOriginImageView
-{
-    self.originImageView.hidden = !self.originImageView.hidden;
-    self.transparentBtn.hidden = self.originImageView.hidden ;
-    if (self.originImageView.hidden == NO) {
-        [self.view bringSubviewToFront:self.transparentBtn];
-        [self.view bringSubviewToFront:self.originImageView];
-    }
-    //    UIImage *image = [UIImage imageWithContentsOfFile:self.imagePath];
-    //    [self.originImageView setImage:image];
-    
-}
-
-
-
-
-/**
- *  滑动slider 调用
- *
- *  @param slider
- */
-
--(IBAction)updateValue:(UISlider *)slider
-{
-    _second = 0;
-    [_myTimer setFireDate:[NSDate distantPast]];
-    if (self.originImageView.hidden == NO) {
-        self.originImageView.hidden = YES;
-        self.transparentBtn.hidden = YES;
-    }
     
     
-    static int beforeIndex = 0;
-    int mValue = slider.value;
-    if (beforeIndex == mValue) {
-        return;
-    }
-    beforeIndex = mValue;
-    
-    [self clearFrontViews];
-    
-    if (slider.tag == 2000) {
-        self.row = mValue;
-    }else{
-        self.column = mValue;
-    }
-    
-    NSLog(@"%d",mValue);
-    
-    NSInteger r = arc4random() % 255;
-    NSInteger g = arc4random() % 255;
-    NSInteger b = arc4random() % 255;
-    
-    self.view.backgroundColor = RGBCOLOR(r, g, b);
-    [self loadImageView:self.originImageView.image];
-}
-
-
-
-
-
-/**
- *  添加图片
- *
- *  @param sender
- */
-- (IBAction)addPic:(id)sender
-{
-    UILongPressGestureRecognizer *gesture = (UILongPressGestureRecognizer *)sender;
-    if (gesture.state == UIGestureRecognizerStateBegan) {
-        UIActionSheet* actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照", @"相册", nil];
-        [actionSheet showInView:self.view];
-    }
-    
-}
-
--(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex != actionSheet.cancelButtonIndex) {
-        UIImagePickerController* controller = [[UIImagePickerController alloc] init];
-        controller.delegate = self;
-        if (buttonIndex == 0) {
-            if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-                return;
+    /**
+     *  是否包含对应状态
+     *
+     */
+    -(BOOL)checkHaveStatus:(NSMutableArray *)nodeData
+    {
+        for (NSArray *array in self.allStatusArray) {
+            if ([array isEqualToArray:nodeData]) {
+                return true;
             }
-            controller.sourceType = UIImagePickerControllerSourceTypeCamera;
         }
-        else {
-            controller.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+        [self.allStatusArray addObject:nodeData];
+        return false;
+    }
+    
+    
+    
+    
+    /**
+     * 移动的空白模块
+     *
+     */
+    
+    -(NSMutableArray *)move:(NSMutableArray *)cNodeData direction:(NSInteger)direction
+    {
+        static NSInteger moveCount = 0;
+        NSMutableArray *currentNodeData = [NSMutableArray arrayWithArray:cNodeData];
+        /**
+         *  9代表着空白的位置
+         */
+        NSInteger pIndex = [currentNodeData indexOfObject:@"9"];
+        static NSString *moveDirection = @"";
+        
+        switch (direction) {
+            case KUP:
+            {
+                if (pIndex < 3) {
+                    return NULL;
+                }else{
+                    currentNodeData[pIndex] = currentNodeData[pIndex - 3];
+                    currentNodeData[pIndex - 3] = @"9";
+                    moveDirection = @"上";
+                }
+                break;
+            }
+            case KDOWN:
+            {
+                if (pIndex > 5)
+                {
+                    return NULL;
+                }else
+                {
+                    currentNodeData[pIndex] = currentNodeData[pIndex + 3];
+                    currentNodeData[pIndex + 3] = @"9";
+                    moveDirection = @"下";
+                }
+                break;
+            }
+            case KLEFT:
+            {
+                if (pIndex == 0 || pIndex == 3 || pIndex == 6)
+                {
+                    return NULL;
+                }
+                else
+                {
+                    currentNodeData[pIndex] = currentNodeData[pIndex - 1];
+                    currentNodeData[pIndex - 1] = @"9";
+                    moveDirection = @"左";
+                }
+                break;
+            }
+            default:
+            {
+                if (pIndex == 2 || pIndex == 5 || pIndex == 8)
+                {
+                    return NULL;
+                }
+                else
+                {
+                    currentNodeData[pIndex] = currentNodeData[pIndex + 1];
+                    currentNodeData[pIndex + 1] = @"9";
+                    moveDirection = @"右";
+                    
+                    
+                }
+                break;
+            }
         }
-        controller.allowsEditing = NO;
-        [self presentViewController:controller animated:YES completion:Nil];
+        
+        
+        NSString *mValue = currentNodeData[pIndex];
+        /**
+         *  移动具体模块
+         */
+        
+        //    [self movePlaceFrom:[mValue integerValue]];
+        
+        
+        //    [UIView animateWithDuration:0.5 animations:^{
+        //    }];
+        //
+        //
+        
+        NSMutableString *mutiStr = [NSMutableString string];
+        for (NSString *str in currentNodeData) {
+            [mutiStr appendString:str];
+        }
+        
+        moveCount ++;
+        NSLog(@"移动方向:%@  移动%d次后的队列：%@",moveDirection,moveCount,mutiStr);
+        long long i = [mutiStr hash];
+        _currentOrder = i;
+        //    NSLog(@"当前hash值%lld",_currentOrder);
+        return currentNodeData;
     }
     
-}
-
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
-{
-    [self dismissViewControllerAnimated:YES completion:Nil];
-    UIImage* image = [info objectForKey:UIImagePickerControllerOriginalImage];
-    [self writeToLocal:image];
     
-    if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
-        picker.view.frame = CGRectMake(0, 20,SharedAppDelegate.window.frame.size.width, SharedAppDelegate.window.frame.size.height - 20);
-        [UIApplication sharedApplication].statusBarHidden = NO;
-    }
-    [self clearFrontViews];
-    [self loadImageView:image];
-    [self.myTimer fire];
-}
-
-
-
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
-{
-    [SharedAppDelegate.window.rootViewController dismissViewControllerAnimated:YES completion:Nil];
     
-}
-
-
--(UIButton *)transparentBtn
-{
-    if (!_transparentBtn) {
-        _transparentBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        _transparentBtn.backgroundColor = [UIColor colorWithRed:255 green:255 blue:255 alpha:0.8];
-        _transparentBtn.frame = CGRectMake(0, 0, screenW, screenH-40);
-        _transparentBtn.hidden = YES;
-        [self.view addSubview:_transparentBtn];
-    }
-    return _transparentBtn;
     
-}
-
-
-
--(IBAction)helpAction:(UIButton *)sender
-{
-    sender.selected = !sender.selected;
-}
-
-
--(IBAction)updateTime
-{
-    _second ++;
-    NSInteger minute = _second/60;
-    NSInteger ssecond = _second%60;
-    self.timeLabel.text = [NSString stringWithFormat:@"%zd分%zd秒",minute,ssecond];
-}
-
-
--(NSTimer *)myTimer
-{
-    if (!_myTimer) {
-        _myTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateTime) userInfo:nil repeats:YES];
+    /**
+     * 移动拼接模块
+     */
+    -(void)movePlaceFrom:(NSInteger)from
+    {
+        
+        UIButton *selectBtn = [self.view viewWithTag:from];
+        //    for (int i = 0; i < _row; i++) {
+        //        for (int j = 0 ; j<_column; j++) {
+        //            NSInteger tag = i+j*_row+1;
+        //            UIButton *btn = [self.view viewWithTag:tag];
+        //            if ([btn.titleLabel.text integerValue]==from) {
+        //                selectBtn = btn;
+        //                break;
+        //            }
+        //        }
+        //    }
+        
+        
+        if (selectBtn) {
+            CGRect frame = selectBtn.frame;
+            selectBtn.frame = self.destinationFrame;
+            self.destinationFrame= frame;
+            //
+            //        [UIView animateWithDuration:0.3 animations:^{
+            //            CGRect frame = selectBtn.frame;
+            //            selectBtn.frame = self.destinationFrame;
+            //            self.destinationFrame= frame;
+            //        }];
+        }
     }
-    return _myTimer;
-}
-
-
--(NSMutableArray *)allStatusArray
-{
-    if (!_allStatusArray) {
-        _allStatusArray = [NSMutableArray array];
-    }
-    return _allStatusArray;
-}
-
-
--(NSMutableArray *)nodeListArray
-{
-    if (!_nodeListArray) {
-        _nodeListArray = [NSMutableArray array];
-    }
-    return _nodeListArray;
-}
-
-
--(NSMutableArray *)rootNodeDataArray
-{
-    if (!_rootNodeDataArray) {
-        _rootNodeDataArray = [NSMutableArray array];
-    }
-    return _rootNodeDataArray;
     
-}
-
-
--(NSMutableArray *)strHashArray
-{
-    if (!_strHashArray) {
-        _strHashArray = [NSMutableArray array];
+    
+    
+    /**
+     *  目标序列hash值的比较
+     *
+     */
+    -(long long)createDestOrder
+    {
+        NSMutableString *mutiStr = [NSMutableString string];
+        for (int i = 1; i<_row*_column+1; i++) {
+            [mutiStr appendString:[NSString stringWithFormat:@"%zd",i]];
+        }
+        long long mValue = [mutiStr hash];
+        NSLog(@"目标序列的hash值 %lld",mValue);
+        return mValue;
     }
-    return _strHashArray;
-}
-
-@end
+    
+    
+    
+    /**
+     *  目标序列本身的比较
+     *
+     */
+    -(BOOL)checkValidate:(NSMutableArray *)nodeDataArray
+    {
+        for (int i = 1; i<_row*_column+1; i++) {
+            
+            //        NSLog(@"%zd",i);
+            NSInteger tagValue = [[nodeDataArray objectAtIndex:i-1]integerValue];
+            if (tagValue != i) {
+                return false;
+            }
+        }
+        return YES;
+    }
+    
+    
+    
+    /**
+     *  产生随机数
+     *
+     *  @param row
+     *  @param column
+     *
+     *  @return
+     */
+    -(NSMutableArray *)randomByRow:(int)row byColumn:(int)column
+    {
+        NSMutableArray *arr = [NSMutableArray array];
+        NSString *object;
+        int x = 0;
+        int y = 0;
+        int z = 0;
+        while (arr.count < row*column) {
+            x = arc4random() % row;
+            y = arc4random() % column;
+            z = arc4random() % (row*column);
+            z+=1;
+            object = [NSString stringWithFormat:@"%d",z];
+            if (![arr containsObject:object]) {
+                [arr addObject:object];
+            }
+        }
+        return arr;
+    }
+    
+    
+    
+    /**
+     *  四周相邻的判断，移动模块的逻辑方法
+     *
+     */
+    -(IBAction)move:(UITapGestureRecognizer *)tap
+    {
+        if (self.finishBtn.tag == 5000) {
+            [self.view makeToast:@"oops,请戳左下角图标！"];
+            return;
+        }
+        CGFloat dOriginY = tap.view.frame.origin.y - self.destinationFrame.origin.y;
+        CGFloat dOrginX = tap.view.frame.origin.x - self.destinationFrame.origin.x;
+        
+        NSInteger originYValue = fabs(dOriginY);
+        NSInteger originXValue = fabs(dOrginX);
+        
+        BOOL con1 = originYValue == self.destinationFrame.size.height+1 ? YES:NO;
+        BOOL con2 = originXValue == self.destinationFrame.size.width+1 ? YES:NO;
+        
+        if ((con1&&self.destinationFrame.origin.x==tap.view.frame.origin.x) || (con2&&self.destinationFrame.origin.y==tap.view.frame.origin.y)) {
+            self.bottleFrame = tap.view.frame;
+            tap.view.frame = self.destinationFrame;
+            self.destinationFrame = self.bottleFrame;
+        }
+    }
+    
+    
+    
+    -(void)writeToLocal:(UIImage *)image
+    {
+        [self.originImageView setImage:image];
+    }
+    
+    
+    /**
+     *  点击完成出发操作
+     *
+     *  @param btn
+     */
+    
+    -(IBAction)finishAction:(UIButton *)btn
+    {
+        
+        if (self.originImageView.hidden == NO) {
+            self.originImageView.hidden = YES;
+            self.transparentBtn.hidden = YES;
+        }
+        
+        
+        self.lastImageView.frame = self.destinationFrame;
+        if (btn.tag == 5000) {
+            self.lastImageView.hidden = YES;
+            [btn setImage:[UIImage imageNamed:@"icon_continue"] forState:UIControlStateNormal];
+            btn.tag = 4000;
+            [_myTimer setFireDate:[NSDate distantPast]];
+        }else{
+            self.lastImageView.hidden = NO;
+            [btn setImage:[UIImage imageNamed:@"icon_end"] forState:UIControlStateNormal];
+            btn.tag = 5000;
+            [_myTimer setFireDate:[NSDate distantFuture]];
+            
+        }
+        
+    }
+    
+    
+    
+    
+    /**
+     *  显示隐藏原图
+     */
+    
+    -(IBAction)showOriginImageView
+    {
+        self.originImageView.hidden = !self.originImageView.hidden;
+        self.transparentBtn.hidden = self.originImageView.hidden ;
+        if (self.originImageView.hidden == NO) {
+            [self.view bringSubviewToFront:self.transparentBtn];
+            [self.view bringSubviewToFront:self.originImageView];
+        }
+        //    UIImage *image = [UIImage imageWithContentsOfFile:self.imagePath];
+        //    [self.originImageView setImage:image];
+        
+    }
+    
+    
+    
+    
+    /**
+     *  滑动slider 调用
+     *
+     *  @param slider
+     */
+    
+    -(IBAction)updateValue:(UISlider *)slider
+    {
+        _second = 0;
+        [_myTimer setFireDate:[NSDate distantPast]];
+        if (self.originImageView.hidden == NO) {
+            self.originImageView.hidden = YES;
+            self.transparentBtn.hidden = YES;
+        }
+        
+        
+        static int beforeIndex = 0;
+        int mValue = slider.value;
+        if (beforeIndex == mValue) {
+            return;
+        }
+        beforeIndex = mValue;
+        
+        [self clearFrontViews];
+        
+        if (slider.tag == 2000) {
+            self.row = mValue;
+        }else{
+            self.column = mValue;
+        }
+        
+        NSLog(@"%d",mValue);
+        
+        NSInteger r = arc4random() % 255;
+        NSInteger g = arc4random() % 255;
+        NSInteger b = arc4random() % 255;
+        
+        self.view.backgroundColor = RGBCOLOR(r, g, b);
+        [self loadImageView:self.originImageView.image];
+    }
+    
+    
+    
+    
+    
+    /**
+     *  添加图片
+     *
+     *  @param sender
+     */
+    - (IBAction)addPic:(id)sender
+    {
+        UILongPressGestureRecognizer *gesture = (UILongPressGestureRecognizer *)sender;
+        if (gesture.state == UIGestureRecognizerStateBegan) {
+            UIActionSheet* actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照", @"相册", nil];
+            [actionSheet showInView:self.view];
+        }
+        
+    }
+    
+    -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+    {
+        if (buttonIndex != actionSheet.cancelButtonIndex) {
+            UIImagePickerController* controller = [[UIImagePickerController alloc] init];
+            controller.delegate = self;
+            if (buttonIndex == 0) {
+                if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+                    return;
+                }
+                controller.sourceType = UIImagePickerControllerSourceTypeCamera;
+            }
+            else {
+                controller.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+            }
+            controller.allowsEditing = NO;
+            [self presentViewController:controller animated:YES completion:Nil];
+        }
+        
+    }
+    
+    - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+    {
+        [self dismissViewControllerAnimated:YES completion:Nil];
+        UIImage* image = [info objectForKey:UIImagePickerControllerOriginalImage];
+        [self writeToLocal:image];
+        
+        if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
+            picker.view.frame = CGRectMake(0, 20,SharedAppDelegate.window.frame.size.width, SharedAppDelegate.window.frame.size.height - 20);
+            [UIApplication sharedApplication].statusBarHidden = NO;
+        }
+        [self clearFrontViews];
+        [self loadImageView:image];
+        [self.myTimer fire];
+    }
+    
+    
+    
+    - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+    {
+        [SharedAppDelegate.window.rootViewController dismissViewControllerAnimated:YES completion:Nil];
+        
+    }
+    
+    
+    -(UIButton *)transparentBtn
+    {
+        if (!_transparentBtn) {
+            _transparentBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+            _transparentBtn.backgroundColor = [UIColor colorWithRed:255 green:255 blue:255 alpha:0.8];
+            _transparentBtn.frame = CGRectMake(0, 0, screenW, screenH-40);
+            _transparentBtn.hidden = YES;
+            [self.view addSubview:_transparentBtn];
+        }
+        return _transparentBtn;
+        
+    }
+    
+    
+    
+    -(IBAction)helpAction:(UIButton *)sender
+    {
+        sender.selected = !sender.selected;
+    }
+    
+    
+    -(IBAction)updateTime
+    {
+        _second ++;
+        NSInteger minute = _second/60;
+        NSInteger ssecond = _second%60;
+        self.timeLabel.text = [NSString stringWithFormat:@"%zd分%zd秒",minute,ssecond];
+    }
+    
+    
+    -(NSTimer *)myTimer
+    {
+        if (!_myTimer) {
+            _myTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateTime) userInfo:nil repeats:YES];
+        }
+        return _myTimer;
+    }
+    
+    
+    -(NSMutableArray *)allStatusArray
+    {
+        if (!_allStatusArray) {
+            _allStatusArray = [NSMutableArray array];
+        }
+        return _allStatusArray;
+    }
+    
+    
+    -(NSMutableArray *)nodeListArray
+    {
+        if (!_nodeListArray) {
+            _nodeListArray = [NSMutableArray array];
+        }
+        return _nodeListArray;
+    }
+    
+    
+    -(NSMutableArray *)rootNodeDataArray
+    {
+        if (!_rootNodeDataArray) {
+            _rootNodeDataArray = [NSMutableArray array];
+        }
+        return _rootNodeDataArray;
+        
+    }
+    
+    
+    -(NSMutableArray *)strHashArray
+    {
+        if (!_strHashArray) {
+            _strHashArray = [NSMutableArray array];
+        }
+        return _strHashArray;
+    }
+    
+    @end
