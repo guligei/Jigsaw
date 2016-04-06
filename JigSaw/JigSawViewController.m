@@ -81,7 +81,7 @@
     self.originImageView.frame = CGRectMake(0, 64, screenW, screenH-self.showBtn.frame.size.height - 10-64);
     self.originImageView.hidden = YES;
     
-   
+    
     [self clearFrontViews];
     [self loadImageView:nil];
     
@@ -133,7 +133,7 @@
     /**
      *  照片拼图
      */
-//    NSDictionary*dict=[imageUtil SeparateImage:image ByX:_row andY:_column cacheQuality:.8 height:screenH-self.showBtn.frame.size.height - 10-64];
+    //    NSDictionary*dict=[imageUtil SeparateImage:image ByX:_row andY:_column cacheQuality:.8 height:screenH-self.showBtn.frame.size.height - 10-64];
     /**
      *  数字拼图
      */
@@ -226,35 +226,42 @@
  */
 -(IBAction)autoMove
 {
+    
+    //    [self nextStep];
+    //    return;
+    
     NodeInfo *rootNode = [[NodeInfo alloc]initNodeInfoWithParentNode:NULL nodeData:self.rootNodeDataArray];
     [self.nodeListArray addObject:rootNode];
-
+    
     while (true)
     {
         /**
          *  返回第一个位置的值，并且把这个元素删除
          */
-        if (self.nodeListArray.count > 0) {
+        if (self.nodeListArray.count > 0)
+        {
             /**
              *  取出来一个值，删除一个值
              */
-             NodeInfo *currentNode  = [self.nodeListArray objectAtIndex:0];
+            NodeInfo *currentNode  = [self.nodeListArray objectAtIndex:0];
             [self.nodeListArray removeObjectAtIndex:0];
             /**
              *  判断是否是目标序列，1：根据hash值；2，根据数组本身
              */
-            if (_currentOrder == _destOrder) {
-//            if ([self checkValidate:currentNode.nodeData]) {
-                
+            //        if (_currentOrder == _destOrder) {
+            if ([self checkValidate:currentNode.nodeData])
+            {
                 NSMutableString *mutiStr = [NSMutableString string];
-                for (NSString *str in currentNode.nodeData) {
+                for (NSString *str in currentNode.nodeData)
+                {
                     [mutiStr appendString:str];
                 }
                 NSLog(@"找到合法序列：%@",mutiStr);
+            }
+            else
+            {
+               
                 
-//                NSLog(@"找到合法序列！");
-                break;
-            }else{
                 /**
                  *  1：上,2：下,3：左,4：右,代表四个方向
                  */
@@ -264,36 +271,118 @@
                     /**
                      *  移动的序列不为空，并且不等于目标序列
                      */
-                    if (movedNodeData != NULL && _currentOrder != _destOrder)
+                    //                if (movedNodeData != NULL && _currentOrder != _destOrder)
+                    if (movedNodeData != NULL && ![self checkValidate:currentNode.nodeData])
                     {
                         /**
                          *  判断是否已经包含该状态
                          */
-                        if (![self checkHaveStatus])
+                        if (![self checkHaveStatus:currentNode.nodeData])
                         {
                             NodeInfo *nodeInfo = [[NodeInfo alloc]initNodeInfoWithParentNode:currentNode nodeData:movedNodeData];
                             [self.nodeListArray addObject:nodeInfo];
                         }
-                    }else if(_currentOrder == _destOrder)
+                        
+                    }
+                    else if([self checkValidate:currentNode.nodeData])
                     {
                         NSMutableString *mutiStr = [NSMutableString string];
-                        for (NSString *str in movedNodeData) {
+                        for (NSString *str in movedNodeData)
+                        {
                             [mutiStr appendString:str];
                         }
                         NSLog(@"找到合法序列：%@",mutiStr);
                         break;
-                    }else{
+                    }else
+                    {
                         NSLog(@"无法移动");
                     }
+               
                 }
+            
+            
+            
             }
-        }else{
+        }
+        else
+        {
             NSLog(@"序列无解！");
             break;
         }
+        
+        
     }
 }
 
+
+
+-(void)nextStep
+{
+    
+    if (self.nodeListArray.count == 0) {
+        NodeInfo *rootNode = [[NodeInfo alloc]initNodeInfoWithParentNode:NULL nodeData:self.rootNodeDataArray];
+        [self.nodeListArray addObject:rootNode];
+    }
+    
+    /**
+     *  返回第一个位置的值，并且把这个元素删除
+     */
+    if (self.nodeListArray.count > 0) {
+        /**
+         *  取出来一个值，删除一个值
+         */
+        NodeInfo *currentNode  = [self.nodeListArray objectAtIndex:0];
+        [self.nodeListArray removeObjectAtIndex:0];
+        /**
+         *  判断是否是目标序列，1：根据hash值；2，根据数组本身
+         */
+        //        if (_currentOrder == _destOrder) {
+        if ([self checkValidate:currentNode.nodeData]) {
+            NSMutableString *mutiStr = [NSMutableString string];
+            for (NSString *str in currentNode.nodeData) {
+                [mutiStr appendString:str];
+            }
+            NSLog(@"找到合法序列：%@",mutiStr);
+        }else{
+            /**
+             *  1：上,2：下,3：左,4：右,代表四个方向
+             */
+            for (int i = 1; i<5; i++)
+            {
+                NSMutableArray *movedNodeData = [self move:currentNode.nodeData direction:i];
+                /**
+                 *  移动的序列不为空，并且不等于目标序列
+                 */
+                //                if (movedNodeData != NULL && _currentOrder != _destOrder)
+                if (movedNodeData != NULL && ![self checkValidate:currentNode.nodeData])
+                {
+                    /**
+                     *  判断是否已经包含该状态
+                     */
+                    if (![self checkHaveStatus])
+                    {
+                        NodeInfo *nodeInfo = [[NodeInfo alloc]initNodeInfoWithParentNode:currentNode nodeData:movedNodeData];
+                        [self.nodeListArray addObject:nodeInfo];
+                    }
+                    
+                }else if([self checkValidate:currentNode.nodeData])
+                {
+                    NSMutableString *mutiStr = [NSMutableString string];
+                    for (NSString *str in movedNodeData) {
+                        [mutiStr appendString:str];
+                    }
+                    NSLog(@"找到合法序列：%@",mutiStr);
+                    break;
+                }else{
+                    NSLog(@"无法移动");
+                }
+            }
+        }
+    }else{
+        NSLog(@"序列无解！");
+    }
+    
+}
 
 
 /**
@@ -346,7 +435,7 @@
      *  9代表着空白的位置
      */
     NSInteger pIndex = [currentNodeData indexOfObject:@"9"];
-    
+    static NSString *moveDirection = @"";
     switch (direction) {
         case KUP:
         {
@@ -355,6 +444,7 @@
             }else{
                 currentNodeData[pIndex] = currentNodeData[pIndex - 3];
                 currentNodeData[pIndex - 3] = @"9";
+                moveDirection = @"上";
             }
             break;
         }
@@ -367,6 +457,8 @@
             {
                 currentNodeData[pIndex] = currentNodeData[pIndex + 3];
                 currentNodeData[pIndex + 3] = @"9";
+                moveDirection = @"下";
+                
             }
             break;
         }
@@ -380,6 +472,8 @@
             {
                 currentNodeData[pIndex] = currentNodeData[pIndex - 1];
                 currentNodeData[pIndex - 1] = @"9";
+                moveDirection = @"左";
+                
             }
             break;
         }
@@ -393,6 +487,8 @@
             {
                 currentNodeData[pIndex] = currentNodeData[pIndex + 1];
                 currentNodeData[pIndex + 1] = @"9";
+                moveDirection = @"右";
+                
                 
             }
             break;
@@ -404,24 +500,23 @@
     /**
      *  移动具体模块
      */
-//    [self movePlaceFrom:[mValue integerValue]];
-
+    //    [self movePlaceFrom:[mValue integerValue]];
     
-//    [UIView animateWithDuration:0.5 animations:^{
-//    }];
-//    
-//
+    
+    //    [UIView animateWithDuration:0.5 animations:^{
+    //    }];
+    //
+    //
     
     NSMutableString *mutiStr = [NSMutableString string];
     for (NSString *str in currentNodeData) {
         [mutiStr appendString:str];
     }
-    
-    NSLog(@"移动%d次后的队列：%@",moveCount,mutiStr);
+    moveCount ++;
+    NSLog(@"移动方向:%@  移动%d次后的队列：%@",moveDirection,moveCount,mutiStr);
     long long i = [mutiStr hash];
     _currentOrder = i;
-//    NSLog(@"当前hash值%lld",_currentOrder);
-    moveCount ++;
+    //    NSLog(@"当前hash值%lld",_currentOrder);
     return currentNodeData;
 }
 
@@ -435,27 +530,27 @@
 {
     
     UIButton *selectBtn = [self.view viewWithTag:from];
-//    for (int i = 0; i < _row; i++) {
-//        for (int j = 0 ; j<_column; j++) {
-//            NSInteger tag = i+j*_row+1;
-//            UIButton *btn = [self.view viewWithTag:tag];
-//            if ([btn.titleLabel.text integerValue]==from) {
-//                selectBtn = btn;
-//                break;
-//            }
-//        }
-//    }
+    //    for (int i = 0; i < _row; i++) {
+    //        for (int j = 0 ; j<_column; j++) {
+    //            NSInteger tag = i+j*_row+1;
+    //            UIButton *btn = [self.view viewWithTag:tag];
+    //            if ([btn.titleLabel.text integerValue]==from) {
+    //                selectBtn = btn;
+    //                break;
+    //            }
+    //        }
+    //    }
     
     if (selectBtn) {
         CGRect frame = selectBtn.frame;
         selectBtn.frame = self.destinationFrame;
         self.destinationFrame= frame;
-//
-//        [UIView animateWithDuration:0.3 animations:^{
-//            CGRect frame = selectBtn.frame;
-//            selectBtn.frame = self.destinationFrame;
-//            self.destinationFrame= frame;
-//        }];
+        //
+        //        [UIView animateWithDuration:0.3 animations:^{
+        //            CGRect frame = selectBtn.frame;
+        //            selectBtn.frame = self.destinationFrame;
+        //            self.destinationFrame= frame;
+        //        }];
     }
 }
 
@@ -485,7 +580,7 @@
 -(BOOL)checkValidate:(NSMutableArray *)nodeDataArray
 {
     for (int i = 1; i<_row*_column+1; i++) {
-        NSLog(@"%zd",i);
+        //        NSLog(@"%zd",i);
         NSInteger tagValue = [[nodeDataArray objectAtIndex:i-1]integerValue];
         if (tagValue != i) {
             return false;
