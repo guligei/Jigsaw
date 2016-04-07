@@ -232,126 +232,59 @@
  */
 -(IBAction)autoMove
 {
+    NSDate *startDate = [NSDate date];
     
     NodeInfo *rootNode = [[NodeInfo alloc]initNodeInfoWithParentNode:NULL nodeData:self.rootNodeDataArray];
     [self.nodeListArray addObject:rootNode];
-    /**
-     *  取出来一个值
-     */
-    NodeInfo *currentNode  = [self.nodeListArray objectAtIndex:0];
-    /**
-     *  判断移动之后的序列是否满足目标序列
-     */
-    BOOL isValidate = [self checkValidate:currentNode.nodeData];
-    if (isValidate)
+    while (true)
     {
-        NSMutableString *mutiStr = [NSMutableString string];
-        for (NSString *str in currentNode.nodeData)
-        {
-            [mutiStr appendString:str];
+        /**
+         *  返回第一个位置的值，并且把这个元素删除
+         */
+        if (self.nodeListArray.count == 0) {
+            NSLog(@"序列无解");
+            break;
         }
-        NSLog(@"找到目的序列：%@",mutiStr);
-    }else{
-        while (true)
+        NodeInfo *currentNode  = [self.nodeListArray objectAtIndex:0];
+        [self.nodeListArray removeObjectAtIndex:0];
+        /**
+         *  判断移动之后的序列是否满足目标序列
+         */
+        BOOL isValidate = [self checkValidate:currentNode.nodeData];
+        if(isValidate)
         {
-            /**
-             *  返回第一个位置的值，并且把这个元素删除
-             */
-            if (self.nodeListArray.count > 0)
+            NSMutableString *mutiStr = [NSMutableString string];
+            for (NSString *str in currentNode.nodeData) {
+                [mutiStr appendString:str];
+            }
+            NSDate *endDate = [NSDate date];
+            NSTimeInterval timeInterval = [endDate timeIntervalSinceDate:startDate];
+            int hour = (int)(timeInterval/3600);
+            int minute = (int)(timeInterval - hour*3600)/60;
+            int second = timeInterval - hour*3600 - minute*60;
+            NSLog(@"找到目标序列:%@,用时:%@",mutiStr,[NSString stringWithFormat:@"%d时%d分%d秒",hour,minute,second]);
+            break;
+        }
+        /**
+         *  1：上,2：下,3：左,4：右,代表四个方向
+         */
+        for (int i = 1; i<5; i++)
+        {
+            NSMutableArray *movedNodeData = [self move:currentNode.nodeData direction:i];
+            if (movedNodeData != NULL)
             {
                 /**
-                 *  取出来一个值，删除一个值
+                 *  判断是否已经包含该序列状态
                  */
-                NodeInfo *currentNode  = [self.nodeListArray objectAtIndex:0];
-                [self.nodeListArray removeObjectAtIndex:0];
-                /**
-                 *  1：上,2：下,3：左,4：右,代表四个方向
-                 */
-                for (int i = 1; i<5; i++)
+                if (![self.allStatusArray containsObject:movedNodeData])
                 {
-                    
-                    NSMutableArray *movedNodeData = [self move:currentNode.nodeData direction:i];
-                    /**
-                     *  判断移动之后的序列是否满足目标序列
-                     */
-                    BOOL isValidate = [self checkValidate:movedNodeData];
-                    if(isValidate)
-                    {
-                        NSMutableString *mutiStr = [NSMutableString string];
-                        for (NSString *str in movedNodeData) {
-                            [mutiStr appendString:str];
-                        }
-                        NSLog(@"找到目的序列：%@",mutiStr);
-                        break;
-                        
-                        
-                        /**
-                         *  保证放入到数组里面的都是不符合最终序列的
-                         *  符合最终序列的，只有移动之后的
-                         *
-                         *  不管移动之后是否符合最终序列，先放入进去
-                         *  然后取出来一个，在判断看是否符合最终序列
-                         */
-                    }else if (!isValidate && movedNodeData != NULL)
-                    {
-                        /**
-                         *  判断是否已经包含该序列状态
-                         */
-                        BOOL isHaveStatus = [self checkHaveStatus:movedNodeData];
-                        if (!isHaveStatus)
-                        {
-                            NodeInfo *nodeInfo = [[NodeInfo alloc]initNodeInfoWithParentNode:currentNode nodeData:movedNodeData];
-                            [self.nodeListArray addObject:nodeInfo];
-                        }else{
-                            NSLog(@"状态已存在");
-                        }
-                    }
-                    else
-                    {
-                        NSLog(@"无法移动");
-                    }
+                    [self.allStatusArray addObject:movedNodeData];
+                    NodeInfo *nodeInfo = [[NodeInfo alloc]initNodeInfoWithParentNode:currentNode nodeData:movedNodeData];
+                    [self.nodeListArray addObject:nodeInfo];
                 }
-            }else{
-                NSLog(@"序列无解");
-                break;
             }
         }
     }
-  
-}
-
-
-/**
- *  是否包含对应状态
- *
- */
--(BOOL)checkHaveStatus
-{
-    for (NSString *i in self.strHashArray) {
-        long long j = [i longLongValue];
-        if (j==_currentOrder) {
-            return true;
-        }
-    }
-    [self.strHashArray addObject:[NSString stringWithFormat:@"%lld",_currentOrder]];
-    return false;
-    
-}
-
-
-/**
- *  是否包含对应状态
- *
- */
--(BOOL)checkHaveStatus:(NSMutableArray *)nodeData
-{
-    for (NSArray *array in self.allStatusArray) {
-        if ([array isEqualToArray:nodeData]) {
-            return true;
-        }
-    }
-    [self.allStatusArray addObject:nodeData];
-    return false;
 }
 
 
@@ -430,29 +363,30 @@
     }
     
     
-    NSString *mValue = currentNodeData[pIndex];
-    /**
-     *  移动具体模块
-     */
-    
-    //    [self movePlaceFrom:[mValue integerValue]];
-    
-    
-    //    [UIView animateWithDuration:0.5 animations:^{
-    //    }];
-    //
-    //
-    
-    NSMutableString *mutiStr = [NSMutableString string];
-    for (NSString *str in currentNodeData) {
-        [mutiStr appendString:str];
-    }
-    
+//    NSString *mValue = currentNodeData[pIndex];
+//    /**
+//     *  移动具体模块
+//     */
+//    
+//    //    [self movePlaceFrom:[mValue integerValue]];
+//    
+//    
+//    //    [UIView animateWithDuration:0.5 animations:^{
+//    //    }];
+//    //
+//    //
+//    
+//    NSMutableString *mutiStr = [NSMutableString string];
+//    for (NSString *str in currentNodeData) {
+//        [mutiStr appendString:str];
+//    }
+//
     moveCount ++;
-    NSLog(@"移动方向:%@  移动%d次后的队列：%@",moveDirection,moveCount,mutiStr);
-    long long i = [mutiStr hash];
-    _currentOrder = i;
-    //    NSLog(@"当前hash值%lld",_currentOrder);
+    NSLog(@"移动次数:%d",moveCount);
+//    NSLog(@"移动方向:%@  移动%d次后的队列：%@",moveDirection,moveCount,mutiStr);
+//    long long i = [mutiStr hash];
+//    _currentOrder = i;
+//    //    NSLog(@"当前hash值%lld",_currentOrder);
     return currentNodeData;
 }
 
